@@ -56,6 +56,19 @@ Dieses Dokument beschreibt Aufbau, Zuständigkeiten, Kommunikation, Zustände, L
 | Berichtigung | DS-01 im Verifikationsbericht behauptete fälschlich „keine Löschfunktion"; einzelne KI-Konten sind per „Remove" + „Save" entfernbar (`assistant/popup.js:183,359-372`) | DS-01 |
 | Frühere Korrekturen K1–K5 | integriert (K1: 5.3/10.3; K2: 6.2; K3: 5.4/6.2; K4: 7.7; K5: 7.1/11) | – |
 
+### 0.6 Nachträge aus Phase 3 (Sicherheits- und Datenschutzprüfung)
+
+Eine erneute Prüfung gegen den Quellcode (Details und Belege in `security-privacy-audit.md`, Abschnitt 2.2) ergab folgende Ergänzungen und Berichtigungen zu diesem Dokument:
+
+| ID | Nachtrag | Betroffene Stellen hier |
+|---|---|---|
+| NF-01 | Das im Beenden-Dialog eingegebene Passwort wird per `postMessage` mit Ziel `*` an das Elternfenster gesendet (`seb/assets/quit.js:25`) und ist damit für Seiten-JavaScript lesbar (ABGELEITET). | 5.3, 6.2, 11 |
+| NF-02 | Die Firefox-Antwortspiegelung gilt nicht nur für Downloads, sondern für jede 200-Antwort, die ein Anhang oder eine Haupt-/Unterframe-Navigation ist und deren URL-Pfad/Dateiname keine Endung hat (`seb/download-stream.js:30-41`, `background.js:111-127`). Die Antwort wird bis 8 MB im Speicher gepuffert und lokal ausgewertet; sie wird nicht übertragen. Wirkung ABGELEITET. | 5.1, 6.2, 11.8 |
+| NF-03 | Es gibt keinerlei Logging (kein `console.*`, kein Ereignisspeicher). | 10 |
+| NF-04 | Der Router unterscheidet nicht nach Absender und validiert keine Nachrichtenschemata; `sender` dient nur zur Tab-Ermittlung (`background.js:212-346`). | 6.2 |
+| NF-05 | Beim Kopieren der Konfiguration in die Zwischenablage wird nur die Schaltflächenbeschriftung zurückgesetzt, nicht der Inhalt (`seb/popup.js:192-196`). | 11.7 |
+| NF-06 | Der Plist-Tokenizer nutzt nicht verankerte lazy Regex-Alternativen (`config-key.js:204-207`); superlineares Laufzeitverhalten bei manipulierten Eingaben ist ABGELEITET möglich. | 12 (TR-03) |
+
 ---
 
 ## 1. Systemüberblick in einem Absatz
@@ -293,7 +306,7 @@ Handler für Datei-Öffnen (140), Datei-Auswahl (153), Verbinden/Trennen (172), 
 Auslöser (einer von mehreren Wegen)
  ├─ Klick/Formular auf SEB-Link ......... seb/content.js → SEB_CAPTURE_URL ──┐
  ├─ HTTP-Antwort ist SEB-Konfiguration .. webRequest.onHeadersReceived ──────┤
- ├─ Download ohne Endung (Firefox) ...... download-stream.js (Spiegelung) ───┤
+ ├─ Antwort ohne Dateiendung (Firefox) .. download-stream.js (Spiegelung; Downloads und Navigationen, NF-02) ┤
  ├─ Blob-Download auf der Seite ......... download-page.js → download-content.js → SEB_CHECK_DOWNLOAD_BYTES
  ├─ Browser-Download-Ereignis ........... downloads.onCreated ──────────────┤
  └─ Nutzer wählt Datei (Import-Tab) ..... file-import.js → SEB_PROCESS_BYTES ┘
@@ -792,7 +805,7 @@ Pro Seite und Frame bei `document_start`: Registrierung der Nachrichten-Listener
 
 | | |
 |---|---|
-| **BESTÄTIGT** | `downloads`, `storage`, `tabs`, `webRequest`, `webRequestBlocking`, `<all_urls>`; Content-Scripts in **allen Frames** aller Seiten ab `document_start`; Firefox deklariert `websiteContent` und `authenticationInfo` als erforderlich (`firefox.manifest.json:85-90`). Genutzt wird von `downloads` nur `onCreated`. Die Hooks `onBeforeSendHeaders` und `onHeadersReceived` sind blockierend und für alle URLs registriert; die Einschränkung auf den Prüfungs-Ursprung erfolgt erst im Code (`headers.js:21`). `onHeadersReceived` bewertet jede Antwort und kann geeignete Downloads erneut abrufen (`background.js:95-107,153-170`). Klick- und Submit-Abfänger laufen auf jeder Seite (`seb/content.js:34-77`); Formulardaten werden erst gelesen, wenn das Ziel eine SEB-URL ist. Auslesen und Eintragen von Fragen erfolgt nur auf Anforderung (Nachrichten `OEB_AI_EXTRACT`/`OEB_AI_APPLY`). Zwölf Ressourcen (Chromium: dreizehn) sind als `web_accessible_resources` freigegeben. Es gibt keine `externally_connectable`-Deklaration. |
+| **BESTÄTIGT** | `downloads`, `storage`, `tabs`, `webRequest`, `webRequestBlocking`, `<all_urls>`; Content-Scripts in **allen Frames** aller Seiten ab `document_start`; Firefox deklariert `websiteContent` und `authenticationInfo` als erforderlich (`firefox.manifest.json:85-90`). Genutzt wird von `downloads` nur `onCreated`. Die Hooks `onBeforeSendHeaders` und `onHeadersReceived` sind blockierend und für alle URLs registriert; die Einschränkung auf den Prüfungs-Ursprung erfolgt erst im Code (`headers.js:21`). `onHeadersReceived` bewertet jede Antwort, kann geeignete Downloads erneut abrufen (`background.js:95-107,153-170`) und puffert in Firefox bei aktivierter Download-Prüfung (Standard) den Körper jeder 200-Antwort auf Haupt-/Unterframe-Navigationen und Anhänge ohne Dateiendung bis 8 MB zur lokalen Auswertung (NF-02, `download-stream.js:30-41`). Klick- und Submit-Abfänger laufen auf jeder Seite (`seb/content.js:34-77`); Formulardaten werden erst gelesen, wenn das Ziel eine SEB-URL ist. Auslesen und Eintragen von Fragen erfolgt nur auf Anforderung (Nachrichten `OEB_AI_EXTRACT`/`OEB_AI_APPLY`). Zwölf Ressourcen (Chromium: dreizehn) sind als `web_accessible_resources` freigegeben. Es gibt keine `externally_connectable`-Deklaration. |
 | **ABGELEITET** | Die Erweiterung hat technisch die Möglichkeit, Anfrage-Header und Seiteninhalte aller besuchten Webseiten zu lesen bzw. zu verändern; der Code beschränkt sich nach Lektüre auf die oben genannten Fälle. Die Fremdinstallation (temporär oder entpackt) erfordert Browser-Entwicklerfunktionen (README). |
 | **OFFEN** | Ob das Laufzeitverhalten dem Code entspricht (NICHT GEPRÜFT). Auswirkung der freigegebenen Ressourcen auf die Sichtbarkeit für Webseiten (OFFEN). |
 
