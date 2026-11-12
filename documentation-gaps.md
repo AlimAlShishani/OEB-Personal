@@ -1,5 +1,7 @@
 # Dokumentationslücken – was vor einer verlässlichen technischen Spezifikation noch fehlt
 
+> **Status Phase 2.1 (2026-11-12):** Punkte A1 und A2 sowie die Korrekturen aus G2, I3 und E3 sind in Revision 2 von `technical-handover.md` und `OEB-Analyse-IT.md` erledigt. D1, D3, D4, G1, G3 und G4 sind dort als Datenschutz-/Sicherheitsabschnitt dokumentiert (Fakten); die zugehörigen Laufzeit- und Rechtsfragen bleiben offen. Alle übrigen Punkte sind unverändert offen. Laufzeit-, Browserkompatibilitäts- und Netzwerktests wurden weiterhin **nicht** durchgeführt.
+
 **Bezug:** Phase-2-Verifikation (`verification-report.md`), geprüft gegen ZIP `OEB-2.4.1`.
 **Zweck:** Übersichtliche Liste der Informationen, die in `technical-handover.md` und `OEB-Analyse-IT.md` fehlen, unklar oder nur als Annahme vorhanden sind.
 **Abgrenzung:** Die Liste dient der **Bewertung, Erkennung und Datenschutz-Einordnung**. Die in Phase 1 bewusst weggelassenen Inhalte (Rechenvorschriften der Header-/Schlüsselberechnung, Konstanten, Profildaten, Prompt-Texte, Seitenstruktur-Selektoren) gelten **nicht** als Lücke und sollen nicht nachdokumentiert werden.
@@ -47,7 +49,7 @@ Verweise (DF-/UA-/TR-/DS-/E-) beziehen sich auf `verification-report.md`.
 
 | # | Fehlende Information | Prio | Art | Bezug |
 |---|---|---|---|---|
-| D1 | **Lebenszyklus je Schlüssel:** Wann geschrieben, wann gelöscht, wann überschrieben? Aktuell fehlt Löschlogik für `oebAiLastRun`, `oebAiProviders`, `oebAiNote`, `oebAiEnabledDomains`, `oebBekCatalogCache`. Es gibt **keine** „Alle Daten löschen"-Funktion. | P1 | K | DS-01, DS-03 |
+| D1 | **Lebenszyklus je Schlüssel:** Wann geschrieben, wann gelöscht, wann überschrieben? Löschbar per UI sind einzelne KI-Konten („Remove" + „Save"), Domain-Freigaben (Schalter) und die Notiz (leeren). Für `oebAiLastRun` und `oebBekCatalogCache` gibt es keine UI-Löschfunktion; es gibt keine „Alle Daten löschen"-Funktion. *(Berichtigt in Phase 2.1.)* | P1 | K | DS-01, DS-03 |
 | D2 | **Verhalten von `storage.session` je Browser** (Verfügbarkeit, Lebensdauer bei Reload/Neustart, Fallback auf `local`). | P1 | T | UA-02, UA-08 |
 | D3 | **Inhalt des Pending-Datensatzes** (inkl. `method`, `body`, `pageUrl`, `tabId`) und seine Aufbewahrungsdauer. | P1 | K | DS-02 |
 | D4 | **Was von `oebAiLastRun` gespeichert wird** (inkl. Bild-`src`-URLs, Fragetexte, Antworten) und wie lange. | P1 | K | DS-03 |
@@ -80,7 +82,7 @@ Verweise (DF-/UA-/TR-/DS-/E-) beziehen sich auf `verification-report.md`.
 | G1 | **Vollständige Verbindungsliste** je Ziel: Auslöser, Häufigkeit, Cookies/Credentials, Nutzdaten. Fehlend: Bild-Abrufe von Fremdhosts (`extract.js:51`), Modelllisten-Abrufe, Custom-Endpunkt, zweiter Abruf der Konfiguration (Probe). | P1 | K | DS-05, DS-01 |
 | G2 | **Korrigierte Katalog-Abrufbedingungen** (nicht „bei Start" garantiert; 6-h-Schwelle, Popup-/Launch-Auslöser). | P1 | K | DF-06 |
 | G3 | **Datenfluss-Diagramm KI-Lauf** mit Datenkategorien (Fragetext, Optionen, Bilder, Notiz) und Entfernungen vor dem Versand; Aufbewahrung beim Anbieter ist anbieterspezifisch und **nicht im Code festgelegt** (nur `store:false` bei OpenAI). | P1 | K+E | DS-04 |
-| G4 | **Umgang mit API-Schlüsseln:** Klartext in `storage.local`, kein Löschen/Export, Übertragung an frei wählbaren Host (Custom). Risikobewertung und Empfehlung (z. B. Schlüsselrotation bei Verlust des Geräts) fehlen. | P1 | E | DS-01 |
+| G4 | **Umgang mit API-Schlüsseln:** Klartext in `storage.local`, einzelnes Entfernen per UI möglich, kein Export, Übertragung an frei wählbaren Host (Custom). Risikobewertung und Empfehlung (z. B. Schlüsselrotation bei Verlust des Geräts) fehlen. | P1 | E | DS-01 |
 | G5 | **Berechtigungsbegründung:** Wofür wird jede Berechtigung genutzt (`downloads`, `tabs`, `<all_urls>`, `webRequestBlocking`)? Fehlt als Tabelle. | P2 | K | DS-07 |
 | G6 | **Exponierte Ressourcen (`web_accessible_resources`)** und Auswirkung auf Sichtbarkeit der Erweiterung für Webseiten. | P2 | K+T | E-02 |
 | G7 | **Datenschutzrechtliche Einordnung** (Art der Daten, Rolle, Meldewege). Nur als Hinweis in IT-Analyse §6, keine Bewertung. | P1 | E | DS-01 bis DS-05 |
