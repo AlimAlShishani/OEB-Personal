@@ -1,6 +1,7 @@
 # Technische Analyse: Browser-Erweiterung „OEB — Open Exam Browser" (Version 2.4.x)
 
 **Zweck dieses Dokuments:** Information für das IT-Team zur Erkennung, Bewertung und Eindämmung der Nutzung dieser Erweiterung bei Online-Prüfungen (Moodle + Safe Exam Browser, SEB).
+**Ergänzung:** Aufbau und Zusammenspiel der Komponenten stehen in `technical-handover.md` (dort Abschnitt 0: Korrekturen an dieser Analyse, hier bereits eingearbeitet; zusätzlich ein lokales Artefakt `oebAiLastRun`, siehe dort K5, und die abweichende Build-Anzeige der Start-Animation, K4).
 **Nicht Zweck:** Dieses Dokument ist keine Anleitung zum Nachbauen, Pflegen oder Verbessern der Erweiterung. Konstanten, Profildaten und Berechnungsdetails der Fälschungsfunktion sind bewusst weggelassen.
 
 **Kennzeichnung der Aussagen**
@@ -58,7 +59,7 @@
 - **[Fakt]** Der Config Key ergibt sich ausschließlich aus der `.seb`-Datei, die ohnehin der Prüfling/der Server kennt.
 - **[Fakt]** Der BEK wird im Modus „automatic" **lokal berechnet** aus der Konfiguration plus buildspezifischen Profildaten (`browser-exam-key.js:34-46`, Profile in `bek.json`, ein Standardprofil für SEB 3.10.2.920 Windows ist mitgeliefert). Alternativ kann ein BEK von Hand eingetragen werden („provided").
 - **[Schluss]** Der BEK ist damit **kein Nachweis**, dass tatsächlich ein unveränderter SEB-Client läuft, sofern die Profildaten des betreffenden Builds bekannt sind. Eine reine „BEK/Config-Key in Moodle erlauben"-Prüfung kann mit denselben Eingaben erfüllt werden.
-- **[Fakt]** Beim Beenden ruft die Erweiterung auf der Moodle-Seite per POST `/mod/quiz/accessrule/seb/clear_session.php` auf (`seb/content.js:285-306`), um die SEB-Sitzung serverseitig zurückzusetzen.
+- **[Fakt]** Bei **jedem Entladen** der Konfiguration (Beenden, „Close exam", Ersetzen durch eine neue Konfiguration) ruft die Erweiterung auf der Moodle-Seite per POST `/mod/quiz/accessrule/seb/clear_session.php` auf (`seb/content.js:285-306`, ausgelöst aus `seb/background.js:615-623`), sofern aus der Start-URL eine Quiz-ID (`cmid`) ermittelt werden konnte, um die SEB-Sitzung serverseitig zurückzusetzen.
 
 ### 2.4 KI-Assistent [Fakt]
 
@@ -111,8 +112,8 @@ Die Content-Scripts laufen in jedem Frame jeder Seite und hinterlassen sichtbare
 | `<div id="oeb-seb-link-status">` | **[Fakt]** `seb/content.js:132` | Nur bei Statusmeldung |
 | Element mit Klasse `oeb-ai-marker` (in Marker-Fragen) | **[Fakt]** `assistant/apply.js:80` | Nur bei Marker-Fragetyp nach KI-Eintrag |
 | Zusätzliches Page-Script im „MAIN world" mit Nachrichtenkanal `oeb-download-capture-v1`; überschreibt `URL.createObjectURL`, `URL.revokeObjectURL` (`seb/download-page.js:13-21`) und `HTMLAnchorElement.prototype.click` (`:92`) | **[Fakt]** `seb/download-page.js`; in Firefox als Content-Script mit `world: "MAIN"` (`firefox.manifest.json:55-65`), in Chromium wird kurz ein `<script src="chrome-extension://…/seb/download-page.js">` ins DOM eingefügt und beim Laden wieder entfernt (`seb/download-content.js:61-66`) | Auf manipulierte Prototypen prüfbar (z. B. `URL.createObjectURL.toString()` enthält keinen `[native code]`) **[Schluss]** |
-| Tastenkombination Ctrl+Shift+X wird im Capture-Modus abgefangen und führt zum Klick auf „Nächste Seite" | **[Fakt]** `assistant/content.js:122-129` | nur auf dem Top-Frame |
-| Hinweis: Das Seiten-JavaScript kann Elemente aus Content-Scripts nicht direkt „sehen", wohl aber das daraus entstehende DOM | **[Schluss]** | — |
+| Tastenkombination Ctrl+Shift+X (Standard): `keydown`-Listener in der Capture-Phase; ist ein aktiver „Weiter"-Button vorhanden, wird das Ereignis verschluckt und der Button per `click()` ausgelöst | **[Fakt]** `assistant/content.js:122-129` | nur auf dem Top-Frame |
+| Hinweis: Content-Scripts teilen das **DOM** mit der Seite. Von der Erweiterung eingefügte Elemente sind für Seiten-JavaScript sichtbar; nur die JS-Objekte der Erweiterung sind getrennt | **[Schluss]** | — |
 
 **Wichtig [Schluss]:** Die Artefakte sind für einen Nutzer mit Quellcode-Zugriff leicht änderbar (IDs umbenennen). Sie taugen als **Hinweis**, nicht als Beweis oder alleinige Schutzmaßnahme. Ein Fehlen der Artefakte bedeutet nicht, dass die Erweiterung nicht aktiv ist.
 
@@ -130,7 +131,7 @@ Die Content-Scripts laufen in jedem Frame jeder Seite und hinterlassen sichtbare
 | User-Agent mit `SEB/3.10.2 (x64)`, aber **ohne** `Chrome/…` oder `Safari/…`-Token (endet nach `Gecko)` direkt mit `SEB/…`) | **[Fakt]** `seb/headers.js:4, 27` | **[Vermutung]** Ob der echte SEB-Client genau diesen UA-Aufbau verwendet, ist hier **nicht verifiziert**. Unbedingt mit Logs echter SEB-Clients im eigenen Haus vergleichen. Ein Abgleich ist die belastbarste Prüfung. |
 | Widerspruch zwischen behauptetem UA (Windows, SEB) und anderen Anfrage-Merkmalen des tatsächlichen Browsers (z. B. Client-Hints `Sec-CH-UA*`, `Sec-Fetch-*`, Header-Reihenfolge, TLS-Fingerabdruck, Sprache, Plattform) | **[Schluss]** Die Erweiterung ersetzt nur `User-Agent`, `ConfigKeyHash` und `RequestHash` (`headers.js:25-33`). Andere Header bleiben die des echten Browsers | **[Vermutung]** Bei Chromium könnten `Sec-CH-UA-Platform` oder `Sec-CH-UA` nicht zum behaupteten UA passen; bei Firefox fehlen Client-Hints. Auch TLS-/HTTP2-Fingerprint (JA3/JA4) entspricht dem Firefox/Chrome, nicht dem im echten SEB eingebetteten Browser. Alles ungetestet. |
 | Behaupteter Build `3.10.2` / `3.10.2.920` | **[Fakt]** Standard-Profil in `bek.json`/`browser-exam-key.js:6` | Hohe Häufung von genau dieser Buildnummer bei Teilnehmern, die real nur ältere/neuere SEB-Versionen ausgeliefert bekamen, ist ein Hinweis. |
-| POST auf `/mod/quiz/accessrule/seb/clear_session.php` nach Prüfungsende, ausgelöst aus dem Browser-Kontext des Teilnehmers | **[Fakt]** `seb/content.js:295` | **[Vermutung]** Ob dieser Aufruf bei echten SEB-Sitzungen anders (anderer Client, anderer Zeitpunkt) auftritt, ist zu prüfen. |
+| POST auf `/mod/quiz/accessrule/seb/clear_session.php` beim Entladen der Konfiguration (Beenden, Ersetzen), ausgelöst aus dem Browser-Kontext des Teilnehmers | **[Fakt]** `seb/content.js:295` | **[Vermutung]** Ob dieser Aufruf bei echten SEB-Sitzungen anders (anderer Client, anderer Zeitpunkt) auftritt, ist zu prüfen. |
 | Nach dem Laden der Konfiguration lädt die Erweiterung die `.seb`-Datei **selbst per `fetch` mit Session-Cookies** nach (`seb/background.js:398-411`) | **[Fakt]** | Zusätzlicher Abruf der Konfigurationsdatei mit „normalem" Browser-UA kurz vor der Prüfung. Bei Moodle ist der Config-Download Teil des regulären „Launch SEB"-Ablaufs, daher schwach aussagekräftig. |
 
 ---
