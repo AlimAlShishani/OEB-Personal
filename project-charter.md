@@ -1,7 +1,7 @@
 # Projektcharta: Browser-Security-Testing-Framework (Arbeitstitel)
 
 **An:** Projektleitung / IT-Abteilung · **Von:** technischer Analyst · **Stand:** 2026-11-12 · **Status:** **Entwurf, nicht freigegeben** · **Klassifizierung:** intern
-**Zugehörig:** `transformation-decision-matrix.md` · `project-roadmap.md` · `phase-4-status.md` · Phase-3-Dokumente (`security-privacy-audit.md`, `reuse-assessment.md`, `security-testing-requirements.md`, `migration-risk-assessment.md`) · Vorarbeiten (`technical-handover.md`, `OEB-Analyse-IT.md`, `verification-report.md`, `documentation-gaps.md`)
+**Zugehörig:** `oeb-transformation-concept.md` · `target-architecture.md` · `transformation-decision-matrix.md` · `project-roadmap.md` · `phase-4-status.md` · Phase-3-Dokumente (`security-privacy-audit.md`, `reuse-assessment.md`, `security-testing-requirements.md`, `migration-risk-assessment.md`) · Vorarbeiten (`technical-handover.md`, `OEB-Analyse-IT.md`, `verification-report.md`, `documentation-gaps.md`)
 
 **Kennzeichnung:** BESTÄTIGT (durch Quellcode bzw. Dokumente belegt) · ABGELEITET (Schlussfolgerung) · OFFEN (Klärung nötig) · NICHT GEPRÜFT (außerhalb des Prüfumfangs).
 **Prüfstatus:** Es wurden bisher keine Laufzeit-, Browserkompatibilitäts- oder Netzwerktests durchgeführt. Dieses Dokument ist reine Planung.

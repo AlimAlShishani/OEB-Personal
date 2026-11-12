@@ -1,7 +1,7 @@
 # Projekt-Roadmap: Browser-Security-Testing-Framework (Vorschlag)
 
 **An:** Projektleitung / IT-Abteilung · **Von:** technischer Analyst · **Stand:** 2026-11-12 · **Status:** Entwurf zur Entscheidung · **Klassifizierung:** intern
-**Zugehörig:** `project-charter.md` · `transformation-decision-matrix.md` · `phase-4-status.md` · Phase-3-Dokumente (insbesondere `security-testing-requirements.md`, `migration-risk-assessment.md`)
+**Zugehörig:** `project-charter.md` · `oeb-transformation-concept.md` · `target-architecture.md` · `transformation-decision-matrix.md` · `phase-4-status.md` · Phase-3-Dokumente (insbesondere `security-testing-requirements.md`, `migration-risk-assessment.md`)
 
 **Kennzeichnung:** BESTÄTIGT · ABGELEITET · OFFEN · NICHT GEPRÜFT (wie in den Vorphasen).
 **Prüfstatus:** Es wurden bisher keine Laufzeit-, Browserkompatibilitäts- oder Netzwerktests durchgeführt.
@@ -15,7 +15,7 @@
 
 | Phase | Titel | Gate am Ende | Status heute |
 |---|---|---|---|
-| **4** | Konzept und Umbauentscheidung | G0 (Option), G1 (Governance/Recht) angestoßen | **In Bearbeitung, nicht abgeschlossen** (`phase-4-status.md`) |
+| **4** | Konzept und Umbauentscheidung | G0 (Option), G1 (Governance/Recht) angestoßen | **Dokumentarisch vollständig (Entwürfe), Abnahme ausstehend** (`phase-4-status.md`) |
 | **5** | Architektur und technische Spezifikation | G2, G3 | Nicht begonnen |
 | **6** | Kontrollierter Aufbau der freigegebenen Komponenten | G4 | Nicht begonnen |
 | **7** | Defensive Tests und Qualitätssicherung | G5 | Nicht begonnen |
@@ -41,18 +41,18 @@
 | E4-2 `transformation-decision-matrix.md` | Lizenz-/Herkunftsstand, Bewertung A/B/C, Empfehlung | Entwurf liegt vor, nicht freigegeben |
 | E4-3 `project-roadmap.md` | dieses Dokument | Entwurf liegt vor, nicht freigegeben |
 | E4-4 `phase-4-status.md` | Bearbeitungsstand, offene Ergebnisse | liegt vor |
-| E4-5 Umbaukonzept (`oeb-transformation-concept.md`) | Detailkonzept zur Umbauoption | **OFFEN – nicht erstellt** (siehe `phase-4-status.md`) |
-| E4-6 Zielarchitektur (`target-architecture.md`) | Konzeptionelles Modell der Verantwortungsbereiche | **OFFEN – nicht erstellt** |
+| E4-5 `oeb-transformation-concept.md` | Transformationskonzept: Erkenntnisse und Anforderungen, neue Projektstruktur, entfallende Bereiche, Lizenz-/Compliance-Ablauf, Vor- und Nachteile | Entwurf liegt vor, nicht freigegeben |
+| E4-6 `target-architecture.md` | Konzeptionelle Zielarchitektur der acht Verantwortungsbereiche | Entwurf liegt vor, nicht freigegeben |
 
 **Abnahmekriterien Phase 4**
-1. Alle Ergebnisse E4-1 bis E4-6 liegen vor **oder** die Projektleitung hat schriftlich entschieden, auf E4-5 und/oder E4-6 in Phase 4 zu verzichten bzw. sie in Phase 5 zu erstellen.
+1. Alle Ergebnisse E4-1 bis E4-6 liegen vor und sind untereinander konsistent. **Erfüllt als Entwurf** (Stand 2026-11-12, siehe `phase-4-status.md` 4); die Freigabe durch die Projektleitung steht aus (Kriterium 5).
 2. Projektleitung hat die Option gewählt und dokumentiert (G0).
 3. Verantwortliche Stelle für Prüfgenehmigungen ist benannt (ED-1).
 4. Lizenz-/Herkunftsstand (Matrix 3) ist von der Rechtsabteilung bewertet; Sperrliste bestätigt oder angepasst.
 5. Charta und Roadmap sind freigegeben oder mit Änderungsauftrag zurückgegeben.
 
 **Abhängigkeiten:** Rechtsabteilung, Datenschutz, Projektleitung.
-**Phase gilt heute als:** nicht abgeschlossen.
+**Phase gilt heute als:** dokumentarisch vollständig (alle sechs Ergebnisse liegen als Entwurf vor), **Abnahme durch die Projektleitung ausstehend** (Kriterien 2 bis 5 offen).
 
 ### Phase 5 – Architektur und technische Spezifikation
 
@@ -60,7 +60,7 @@
 
 | Ergebnis | Inhalt |
 |---|---|
-| E5-1 Zielarchitektur | Verantwortungsbereiche (Browser Environment, Security Checks, Permission Analysis, Communication Security, Privacy Analysis, Test Runner, Evidence Manager, Reporting) mit klarer Trennung von Teststeuerung, Testausführung, Ergebnisverwaltung und Benutzeroberfläche; Schnittstellen auf hoher Ebene |
+| E5-1 Zielarchitektur (Ausgangspunkt: Entwurf `target-architecture.md`, E4-6) | Verantwortungsbereiche (Browser Environment, Security Checks, Permission Analysis, Communication Security, Privacy Analysis, Test Runner, Evidence Manager, Reporting) mit klarer Trennung von Teststeuerung, Testausführung, Ergebnisverwaltung und Benutzeroberfläche; Schnittstellen auf hoher Ebene |
 | E5-2 Bedrohungsmodell | Vertrauensgrenzen, Missbrauchsfälle (insbesondere Scope-Umgehung, Funktionsdrift), Gegenmaßnahmen |
 | E5-3 Technische Spezifikation | Datenmodelle (Prüfauftrag, Scope, Testfall, Lauf, Beobachtung, Befund, Nachweis, Ereignis), Nachrichten- und Schnittstellenverträge mit Schema-Validierung, Ereignisschema, Berichtsvorlagen |
 | E5-4 Plattform- und Technologieentscheidung | Architekturrichtung (ED-3), Umgang mit auslaufenden Plattformen (SR-NF-01), Zielbrowser/-versionen (ED-2, Browser-Matrix) |
@@ -199,4 +199,4 @@ Nur falls die Projektleitung Option A wählt (nicht empfohlen, siehe Matrix 5):
 | RP-6 | Umgang mit dem Arbeitsstrang „Prüfungsintegrität" | OFFEN (ED-5) |
 | RP-7 | Beteiligung von Datenschutz, Rechtsabteilung, Personalvertretung | OFFEN (ED-6) |
 | RP-8 | Zielwert der Testabdeckung | OFFEN (ED-7) |
-| RP-9 | Entscheidung über E4-5 und E4-6 (Detailkonzept, Zielarchitektur) | OFFEN (Projektleitung) |
+| RP-9 | Freigabe der Entwürfe E4-1 bis E4-6 | OFFEN (Projektleitung) |

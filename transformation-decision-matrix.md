@@ -1,7 +1,7 @@
 # Entscheidungsmatrix: Ausgangsbasis für das Browser-Security-Testing-Framework (Phase 4)
 
 **An:** Projektleitung / IT-Abteilung · **Von:** technischer Analyst · **Stand:** 2026-11-12 · **Status:** Entwurf zur Entscheidung · **Klassifizierung:** intern
-**Zugehörig:** `project-charter.md` · `project-roadmap.md` · `phase-4-status.md` · Phase-3-Dokumente · Vorarbeiten (Phase 1–2.1)
+**Zugehörig:** `project-charter.md` · `oeb-transformation-concept.md` · `target-architecture.md` · `project-roadmap.md` · `phase-4-status.md` · Phase-3-Dokumente · Vorarbeiten (Phase 1–2.1)
 
 **Kennzeichnung:** BESTÄTIGT (durch Quellcode, Dateien oder Dokumente belegt) · ABGELEITET (Schlussfolgerung) · OFFEN (Klärung nötig; Grund angegeben) · NICHT GEPRÜFT (außerhalb des Prüfumfangs).
 **Prüfstatus:** Es wurden keine Laufzeit-, Browserkompatibilitäts- oder Netzwerktests durchgeführt. Es wurden keine Quell-, Konfigurations- oder Build-Dateien verändert.
